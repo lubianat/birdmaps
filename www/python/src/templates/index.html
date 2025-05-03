@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Select a city</title>
+  <title>Select a location</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.11/jquery.autocomplete.min.js">
   </script>
@@ -39,11 +39,30 @@
   <div class="container">
     <div class="row">
       <div class="col">
-        <h1 class="my-4">Select a city</h1>
-        <form action="/map" method="get">
+        <h1 class="my-4">Birdmaps: Select a location</h1>
+
+        <p class="lead">This tool helps you find and enrich birdwatching hotspots by connecting data from <a
+            href="https://www.wikidata.org/wiki/Q1273673" target="_blank">Wikidata</a> and <a href="https://ebird.org/"
+            target="_blank">eBird</a>. Follow the workflow below:</p>
+
+        <ol>
+          <li>Select a location with coordinates (<a href="https://www.wikidata.org/wiki/Property:P625"
+              target="_blank">P625</a>) from Wikidata using the autocomplete below.</li>
+          <li>Find <a href="https://ebird.org/" target="_blank">eBird</a> hotspots around it by clicking "Submit".</li>
+          <li><span style="color:red;">Red hotspots</span> lack eBird hotspot IDs (<a
+              href="https://www.wikidata.org/wiki/Property:P5200" target="_blank">P5200</a>) on Wikidata.</li>
+          <li>You can copy the eBird hotspot ID (Ctrl/Cmd+C), search on Wikidata, and add it via the GUI to the correct
+            item.</li>
+          <li>After reloading, hotspots with IDs will appear <span style="color:blue;">blue</span> and show images (if
+            available on Wikidata).</li>
+        </ol>
+
+        <hr>
+
+        <form action="/map" method="get" onsubmit="return validateCoordinates();">
           <div class="form-group">
-            <label for="city">City (select from the autocomplete list):</label><br>
-            <input type="text" id="city" name="city" class="form-control">
+            <label for="city">Location (select from Wikidata):</label><br>
+            <input type="text" id="city" class="form-control" placeholder="Start typing...">
             <input type="hidden" id="lat" name="lat">
             <input type="hidden" id="lng" name="lng">
             <label for="dist">Search radius (in km):</label><br>
@@ -56,10 +75,23 @@
       </div>
     </div>
   </div>
+
   {% include '_footer.html' %}
 
   <script src="{{ url_for('static', filename='script.js') }}"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+  <script>
+    function validateCoordinates() {
+      const lat = document.getElementById('lat').value;
+      const lng = document.getElementById('lng').value;
+      if (!lat || !lng) {
+        alert('Please select a valid location from the autocomplete list.');
+        return false;
+      }
+      return true;
+    }
+  </script>
 </body>
 
 </html>

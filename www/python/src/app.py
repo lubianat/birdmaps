@@ -1,7 +1,12 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 from SPARQLWrapper import SPARQLWrapper, JSON
+import dotenv
+import os
 
+# Load environment variables from .env file
+dotenv.load_dotenv()
+EBIRD_API_KEY = os.getenv("EBIRD_API_KEY")
 app = Flask(__name__)
 
 sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
@@ -57,7 +62,8 @@ def map():
     lng = request.args.get("lng", "")
     dist = request.args.get("dist", "25")
     ebird_api_url = f"https://api.ebird.org/v2/ref/hotspot/geo?lat={lat}&lng={lng}&dist={dist}&fmt=json"
-    response = requests.get(ebird_api_url)
+    print(ebird_api_url)
+    response = requests.get(ebird_api_url, headers={"X-eBirdApiToken": EBIRD_API_KEY})
     data = response.json()
     locIDs = [item["locId"] for item in data]
     wikidata_results = run_sparql_query(locIDs)
